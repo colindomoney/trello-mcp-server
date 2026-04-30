@@ -1,5 +1,6 @@
 import logging
 import os
+from importlib.metadata import version, PackageNotFoundError
 
 import uvicorn
 from dotenv import load_dotenv
@@ -19,11 +20,52 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 
+try:
+    _version = version("trello-mcp")
+except PackageNotFoundError:
+    try:
+        import tomllib
+        from pathlib import Path
+        with open(Path(__file__).parent / "pyproject.toml", "rb") as _f:
+            _version = tomllib.load(_f)["project"]["version"]
+    except Exception:
+        _version = "unknown"
+
 # Initialize MCP server
-mcp = FastMCP("Trello MCP Server")
+mcp = FastMCP("Trello MCP Server", version=_version)
 
 # Register tools
 register_tools(mcp)
+
+
+@mcp.tool()
+async def get_server_info() -> dict:
+    """Returns server version, configuration, and Trello API connectivity status."""
+    import httpx
+    api_key = os.getenv("TRELLO_API_KEY", "")
+    token = os.getenv("TRELLO_TOKEN", "")
+
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get(
+                "https://api.trello.com/1/members/me",
+                params={"key": api_key, "token": token},
+                timeout=5,
+            )
+        trello_status = "ok" if r.status_code == 200 else f"error {r.status_code}"
+        trello_user = r.json().get("fullName") if r.status_code == 200 else None
+    except Exception as e:
+        trello_status = f"unreachable: {e}"
+        trello_user = None
+
+    return {
+        "server": "Trello MCP Server",
+        "version": _version,
+        "trello_api_status": trello_status,
+        "trello_user": trello_user,
+        "api_key_set": bool(api_key),
+        "token_set": bool(token),
+    }
 
 
 def start_claude_server():
