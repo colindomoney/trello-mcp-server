@@ -32,7 +32,7 @@ except PackageNotFoundError:
         _version = "unknown"
 
 # Initialize MCP server
-mcp = FastMCP("Trello MCP Server", version=_version)
+mcp = FastMCP("Trello MCP Server")
 
 # Register tools
 register_tools(mcp)
