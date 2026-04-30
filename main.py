@@ -58,9 +58,20 @@ async def get_server_info() -> dict:
         trello_status = f"unreachable: {e}"
         trello_user = None
 
+    try:
+        import subprocess
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=Path(__file__).parent,
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+    except Exception:
+        sha = "unknown"
+
     return {
         "server": "Trello MCP Server",
         "version": _version,
+        "git_sha": sha,
         "trello_api_status": trello_status,
         "trello_user": trello_user,
         "api_key_set": bool(api_key),
