@@ -11,8 +11,5 @@ wheels/
 
 .env
 
-# uv lock file
-uv.lock
-
 # Claude Code local settings
 .claude/
