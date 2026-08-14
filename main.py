@@ -4,7 +4,7 @@ from importlib.metadata import version, PackageNotFoundError
 
 import uvicorn
 from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
@@ -32,7 +32,7 @@ except PackageNotFoundError:
         _version = "unknown"
 
 # Initialize MCP server
-mcp = FastMCP("Trello MCP Server")
+mcp = MCPServer("Trello MCP Server", version=_version)
 
 # Register tools
 register_tools(mcp)

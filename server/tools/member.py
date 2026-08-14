@@ -4,7 +4,7 @@ This module contains tools for managing Trello members.
 
 import logging
 
-from mcp.server.fastmcp import Context
+from mcp.server.mcpserver import Context
 
 from server.models import TrelloMember
 from server.services.member import MemberService
