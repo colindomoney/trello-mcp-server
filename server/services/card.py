@@ -25,7 +25,7 @@ class CardService:
         Returns:
             TrelloCard: The card object containing card details.
         """
-        response = await self.client.GET(f"/cards/{card_id}", params={"attachments": "true"})
+        response = await self.client.GET(f"/cards/{card_id}", params={"attachments": "true", "fields": "all"})
         return TrelloCard(**response)
 
     async def get_cards(
@@ -44,7 +44,7 @@ class CardService:
         Returns:
             List[TrelloCard]: A list of card objects.
         """
-        response = await self.client.GET(f"/lists/{list_id}/cards")
+        response = await self.client.GET(f"/lists/{list_id}/cards", params={"fields": "all"})
         cards = [TrelloCard(**card) for card in response]
         if member_id:
             cards = [c for c in cards if member_id in c.idMembers]
